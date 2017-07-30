@@ -1,0 +1,139 @@
+<html>
+    <head>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="row">
+            
+            <div id="tree"></div>
+        <script
+            src="http://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type=text/javascript></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+        var tree=[];
+            $(document).ready(function(){
+                var data=[
+                    {
+                        CNTCATE_ID:1,
+                        PRT_CNTCATE_ID:0,
+                        CNTCATE_NAME:'1'
+                    },
+                    {
+                        CNTCATE_ID:2,
+                        PRT_CNTCATE_ID:1,
+                        CNTCATE_NAME:'2'
+                    },
+                    {
+                        CNTCATE_ID:3,
+                        PRT_CNTCATE_ID:2,
+                        CNTCATE_NAME:'3'
+                    },
+                    {
+                        CNTCATE_ID:4,
+                        PRT_CNTCATE_ID:1,
+                        CNTCATE_NAME:'4'
+                    },
+                    {
+                        CNTCATE_ID:5,
+                        PRT_CNTCATE_ID:4,
+                        CNTCATE_NAME:'5'
+                    },
+                    {
+                        CNTCATE_ID:6,
+                        PRT_CNTCATE_ID:1,
+                        CNTCATE_NAME:'6'
+                    },
+                    {
+                        CNTCATE_ID:7,
+                        PRT_CNTCATE_ID:4,
+                        CNTCATE_NAME:'7'
+                    },
+                    {
+                        CNTCATE_ID:8,
+                        PRT_CNTCATE_ID:0,
+                        CNTCATE_NAME:'8'
+                    },
+                    {
+                        CNTCATE_ID:9,
+                        PRT_CNTCATE_ID:2,
+                        CNTCATE_NAME:'9'
+                    },
+                    {
+                        CNTCATE_ID:10,
+                        PRT_CNTCATE_ID:3,
+                        CNTCATE_NAME:'10'
+                    },
+                    {
+                        CNTCATE_ID:11,
+                        PRT_CNTCATE_ID:8,
+                        CNTCATE_NAME:'11'
+                    }
+                ];
+                var _child_head=data.filter(function(head){
+                    return head.PRT_CNTCATE_ID==0;
+                });
+                for(var i=0;i<_child_head.length;i++){
+                    var _newNode={
+                        text:_child_head[i].CNTCATE_NAME,
+                        id:_child_head[i].CNTCATE_ID,
+                        nodes:[]
+                    };
+                    tree.push(_newNode);
+                    FindChildInData(data,_child_head[i],_child_head[i].CNTCATE_ID)
+                }
+                console.log(JSON.stringify(tree,null,2))
+                $('#tree').treeview({
+                    data: JSON.stringify(tree,null,2),
+                    levels:1
+                });
+            });
+            function FindChildInData(data,head,rootId){
+                var _child=data.filter(function(child){ return child.PRT_CNTCATE_ID==head.CNTCATE_ID});
+                for(var i=0;i<_child.length;i++){
+                    var _newNode={
+                        text:_child[i].CNTCATE_NAME,
+                        id:_child[i].CNTCATE_ID,
+                        nodes:[]
+                    };
+                    var _rootData=tree.filter(function(root){ return root.id==rootId});
+                    var _findNode= FindChildInTree(_rootData[0],head.CNTCATE_ID,data);
+                    //console.log('_findNode',_findNode)
+                    if(_findNode!=false){
+                        _findNode.nodes.push(_newNode);
+                    }
+                    //console.log(_child)
+                    FindChildInData(data,_child[i],rootId)
+                }
+            }
+            function FindChildInTree(currentNode,id,data){
+                //console.log('currentNode',currentNode.id)
+                //console.log('id',id)
+                var result;
+                var currentChild=[];
+                if(id==currentNode.id){
+                    //console.log('result',currentNode[0].id)
+                    return currentNode;
+                }else{
+                    //console.log('currentNode',currentNode[0].id)
+                    var _totalChildInLevel=data.filter(function(childLevel){ return childLevel.PRT_CNTCATE_ID==currentNode.id}).length;
+                    //console.log('totalChild',_totalChildInLevel)
+                    for(var i=0;i<_totalChildInLevel;i++){
+                        //console.log('currentCHild',currentNode[0].nodes[a])
+                        currentChild.push(currentNode.nodes[i]);
+                        //console.log('currentChild',currentChild)
+                        
+                        result=FindChildInTree(currentChild[currentChild.length-1],id,data);
+                        if(result!==false){
+                            return result;
+                        }
+                    
+                    }
+                    return false;
+                }
+            } 
+        </script>
+    </body>
+</html>
